@@ -1,0 +1,16 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+
+p {
+	align-items: center;
+	
+	font-size: 15px;
+	margin-top: 50px;
+ margin-right: 40px;
+ margin-left: 300px;
+margin-bottom: 20px;
+}

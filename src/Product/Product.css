@@ -1,0 +1,198 @@
+/* Product grid container */
+.product {
+  display: grid;
+  margin-top: 35px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 0 20px;
+}
+
+/* Individual product card */
+.cards {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 0 0 1px #eee;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cards:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Like and balance icons */
+.like {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: #9aa7c7;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.like svg {
+  transition: 0.3s;
+}
+
+.like svg:hover {
+  color: #ff6b6b;
+}
+
+/* Product image */
+/* Product.css da yangilash */
+.cards img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover; /* contain o'rniga cover */
+  margin: 30px 0 10px;
+  display: block; /* BU MUHIM! */
+  background: #f5f5f5; /* Rasm yuklanmasa ko'rinadi */
+}
+
+/* Product title */
+.cards h3 {
+  font-size: 14px;
+  line-height: 1.3;
+  min-height: 40px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+/* Star rating container */
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.stars svg {
+  color: #ddd;
+}
+
+/* Old price (strikethrough) */
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 13px;
+  margin: 0 0 4px 0;
+}
+
+/* Current price */
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1a73e8;
+  margin: 0 0 6px 0;
+}
+
+/* Installment info */
+.installment {
+  border: 1px solid #ff9800;
+  color: #ff9800;
+  font-size: 13px;
+  padding: 6px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Buttons container */
+.buttons {
+  margin-top: auto;
+  display: flex;
+  gap: 10px;
+}
+
+/* Cart button */
+.cart-btn {
+  background: #00bfa5;
+  border: none;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.cart-btn:hover {
+  background: #00a38a;
+  transform: translateY(-2px);
+}
+
+/* Buy button */
+.buy-btn {
+  flex: 1;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+  font-weight: 500;
+}
+.badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.stars span {
+  margin-left: 5px;
+  font-size: 13px;
+  color: #666;
+}
+.buy-btn:hover {
+  background: #1557b0;
+  transform: translateY(-2px);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .product {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .product {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .product {
+    grid-template-columns: 1fr;
+    padding: 0 10px;
+  }
+  
+  .cards img {
+    height: 200px;
+  }
+}
