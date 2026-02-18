@@ -14,6 +14,8 @@ import {
 
 const USER_STORAGE_KEY = "saxiy_google_user";
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
+const MISSING_CLIENT_ID_MESSAGE = "Google login uchun VITE_GOOGLE_CLIENT_ID ni .env va Netlify Environment Variables ga qo'shing.";
 
 function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
   const tokenClientRef = useRef(null);
@@ -36,7 +38,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
       return null;
     }
   });
-  const [authStatus, setAuthStatus] = useState("");
+  const [authStatus, setAuthStatus] = useState(() => (GOOGLE_CLIENT_ID ? "" : MISSING_CLIENT_ID_MESSAGE));
 
   const createTokenClient = () => {
     const oauth2 = window.google?.accounts?.oauth2;
@@ -52,14 +54,14 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
   };
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) {
-      return;
-    }
-
     let isUnmounted = false;
     let pollTimer = null;
 
     const initGoogleClient = () => {
+      if (!GOOGLE_CLIENT_ID) {
+        return false;
+      }
+
       const client = createTokenClient();
       if (!client) {
         return false;
@@ -81,7 +83,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
     const script = existingScript || document.createElement("script");
 
     if (!existingScript) {
-      script.src = "https://accounts.google.com/gsi/client";
+      script.src = GOOGLE_SCRIPT_SRC;
       script.async = true;
       script.defer = true;
       script.dataset.googleGsi = "true";
@@ -89,6 +91,10 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
     }
 
     const startInitPolling = () => {
+      if (!GOOGLE_CLIENT_ID) {
+        return;
+      }
+
       if (initGoogleClient()) {
         return;
       }
@@ -157,7 +163,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
 
   const handleGoogleAuth = (mode) => {
     if (!GOOGLE_CLIENT_ID) {
-      setAuthStatus("Google auth uchun .env ichida VITE_GOOGLE_CLIENT_ID kiriting.");
+      setAuthStatus(MISSING_CLIENT_ID_MESSAGE);
       return;
     }
 
@@ -236,6 +242,8 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
     "Noutbuklar"
   ];
 
+  const authDisabled = Boolean(GOOGLE_CLIENT_ID) && !googleReady;
+
   return (
     <header className="navbar">
       <div className="navbar-shell">
@@ -299,7 +307,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
                   <button
                     className="auth-btn login-btn"
                     type="button"
-                    disabled={!googleReady}
+                    disabled={authDisabled}
                     onClick={() => handleGoogleAuth("login")}
                   >
                     <FaGoogle />
@@ -308,7 +316,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
                   <button
                     className="auth-btn register-btn"
                     type="button"
-                    disabled={!googleReady}
+                    disabled={authDisabled}
                     onClick={() => handleGoogleAuth("register")}
                   >
                     <FaGoogle />

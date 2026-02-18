@@ -1,16 +1,105 @@
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+.site-footer {
+  margin-top: 42px;
+  background:
+    radial-gradient(circle at 14% -20%, rgba(30, 132, 255, 0.24), transparent 55%),
+    linear-gradient(180deg, #f4f9ff 0%, #ecf4ff 100%);
+  border-top: 1px solid #d6e3f8;
+  padding: 24px 0 14px;
 }
 
+.footer-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
 
-p {
-	align-items: center;
-	
-	font-size: 15px;
-	margin-top: 50px;
- margin-right: 40px;
- margin-left: 300px;
-margin-bottom: 20px;
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(145deg, #1a73e8, #0b57c9);
+  box-shadow: 0 8px 16px rgba(26, 115, 232, 0.26);
+}
+
+.footer-brand h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1c4f95;
+}
+
+.footer-brand p {
+  margin: 3px 0 0;
+  color: #5b7298;
+  font-size: 13px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #2e4e7b;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #cddff8;
+  background: #f8fbff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.footer-links a:hover {
+  background: #e8f1ff;
+  color: #1a63bf;
+}
+
+.footer-copy {
+  max-width: 1280px;
+  margin: 14px auto 0;
+  padding: 12px 20px 0;
+  border-top: 1px solid #dbe7fa;
+  color: #5e7499;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .footer-shell {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 14px;
+  }
+
+  .footer-copy {
+    padding: 12px 14px 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-links {
+    width: 100%;
+  }
+
+  .footer-links a {
+    flex: 1 1 calc(50% - 8px);
+    text-align: center;
+  }
 }

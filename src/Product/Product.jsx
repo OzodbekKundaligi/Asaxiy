@@ -29,6 +29,11 @@ function Product() {
     setSelectedProduct(null);
   };
 
+  const formatPrice = (value) => {
+    const numberValue = Number(value) || 0;
+    return numberValue.toLocaleString('uz-UZ');
+  };
+
   const normalizedQuery = searchQuery.trim().toLowerCase();
   const filteredProducts = products.filter((product) => {
     if (!normalizedQuery) {
@@ -43,58 +48,84 @@ function Product() {
     return searchableText.includes(normalizedQuery);
   });
 
+  const resultLabel = normalizedQuery
+    ? `"${searchQuery}" bo'yicha ${filteredProducts.length} ta natija`
+    : `${filteredProducts.length} ta mahsulot topildi`;
+
   return (
     <>
       <Navbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <div className="product">
-        {filteredProducts.map((p) => (
-          <div className="cards" key={p.id}>
-            {p.badge && (
-              <span
-                className="badge"
-                style={{
-                  background: p.badge === 'Aksiya' ? '#ff6b6b' : '#00bfa5'
-                }}
-              >
-                {p.badge}
-              </span>
-            )}
 
-            <div className="like">
-              <FaHeart />
-              <FaBalanceScale />
+      <main className="store-page">
+        <div className="content-shell">
+          <section className="catalog-head">
+            <div>
+              <h1>Top Mahsulotlar</h1>
+              <p>Eng yaxshi narxlar va tezkor yetkazib berish bilan xarid qiling.</p>
             </div>
+            <span className="catalog-count">{resultLabel}</span>
+          </section>
 
-            <img src={p.image} alt={p.name} />
+          <section className="product">
+            {filteredProducts.map((p) => {
+              const rating = Number(p.rating) || 0;
+              const oldPrice = Number(p.oldPrice) || 0;
 
-            <h3>{p.name}</h3>
+              return (
+                <article className="cards" key={p.id}>
+                  {p.badge && (
+                    <span
+                      className="badge"
+                      style={{
+                        background: p.badge.toLowerCase() === 'aksiya' ? '#ff6b6b' : '#00bfa5'
+                      }}
+                    >
+                      {p.badge}
+                    </span>
+                  )}
 
-            <div className="stars">
-              {[...Array(5)].map((_, i) => (
-                <FaStar key={i} color={i < Math.floor(p.rating) ? '#ffc107' : '#ddd'} />
-              ))}
-              <span>({p.reviews})</span>
-            </div>
+                  <div className="like">
+                    <button type="button" aria-label="Sevimlilar">
+                      <FaHeart />
+                    </button>
+                    <button type="button" aria-label="Taqqoslash">
+                      <FaBalanceScale />
+                    </button>
+                  </div>
 
-            {p.oldPrice && <p className="old-price">{p.oldPrice.toLocaleString()} som</p>}
+                  <img className="product-image" src={p.image} alt={p.name} />
 
-            <p className="price">{p.price.toLocaleString()} som</p>
+                  <h3>{p.name}</h3>
 
-            {p.installment && <div className="installment">{p.installment}</div>}
+                  <div className="stars">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} color={i < Math.floor(rating) ? '#ffc107' : '#d9e1ee'} />
+                    ))}
+                    <span>({p.reviews || 0})</span>
+                  </div>
 
-            <div className="buttons">
-              <button className="cart-btn" type="button">
-                <FaShoppingCart /> Savatga
-              </button>
-              <button className="buy-btn" type="button" onClick={() => handleBuyClick(p)}>
-                Bir klikda xarid
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+                  {oldPrice > 0 && <p className="old-price">{formatPrice(oldPrice)} som</p>}
 
-      {!filteredProducts.length && <p className="empty-search">Mahsulot topilmadi.</p>}
+                  <p className="price">{formatPrice(p.price)} som</p>
+
+                  {p.installment && <div className="installment">{p.installment}</div>}
+
+                  <div className="buttons">
+                    <button className="cart-btn" type="button">
+                      <FaShoppingCart /> Savatga
+                    </button>
+                    <button className="buy-btn" type="button" onClick={() => handleBuyClick(p)}>
+                      Bir klikda xarid
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+
+          {!filteredProducts.length && <p className="empty-search">Bu qidiruv bo'yicha mahsulot topilmadi.</p>}
+        </div>
+      </main>
 
       {modalOpen && selectedProduct && (
         <BuyInOneClickModal open={modalOpen} handleClose={handleCloseModal} product={selectedProduct} />
