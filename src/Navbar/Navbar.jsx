@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./Navbar.css";
+import React, { useEffect, useRef, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import './Navbar.css';
 import {
   FaBars,
   FaBalanceScale,
@@ -10,18 +11,30 @@ import {
   FaGlobe,
   FaGoogle,
   FaSignOutAlt
-} from "react-icons/fa";
+} from 'react-icons/fa';
+import { ACTION_LINKS, CATEGORY_LINKS, DEFAULT_CATEGORY } from '../config/navigation';
 
-const USER_STORAGE_KEY = "saxiy_google_user";
+const USER_STORAGE_KEY = 'saxiy_google_user';
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
+const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 const MISSING_CLIENT_ID_MESSAGE = "Google login uchun VITE_GOOGLE_CLIENT_ID ni .env va Netlify Environment Variables ga qo'shing.";
 
-function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
+const ACTION_ICON_MAP = {
+  "Taqqoslash": <FaBalanceScale />,
+  "To'lov qilish": <FaCreditCard />,
+  'Buyurtma holati': <FaTruck />,
+  Savat: <FaShoppingCart />,
+  Sevimlilar: <FaHeart />
+};
+
+function Navbar({ searchQuery = '', onSearchChange = () => {} }) {
   const tokenClientRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [googleReady, setGoogleReady] = useState(false);
+  const [language, setLanguage] = useState('uz');
   const [user, setUser] = useState(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return null;
     }
 
@@ -34,11 +47,11 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
       return JSON.parse(savedUser);
     } catch (error) {
       localStorage.removeItem(USER_STORAGE_KEY);
-      console.error("Saved user parsing failed:", error);
+      console.error('Saved user parsing failed:', error);
       return null;
     }
   });
-  const [authStatus, setAuthStatus] = useState(() => (GOOGLE_CLIENT_ID ? "" : MISSING_CLIENT_ID_MESSAGE));
+  const [authStatus, setAuthStatus] = useState(() => (GOOGLE_CLIENT_ID ? '' : MISSING_CLIENT_ID_MESSAGE));
 
   const createTokenClient = () => {
     const oauth2 = window.google?.accounts?.oauth2;
@@ -48,7 +61,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
 
     return oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
-      scope: "openid profile email",
+      scope: 'openid profile email',
       callback: () => {}
     });
   };
@@ -70,23 +83,23 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
       tokenClientRef.current = client;
       if (!isUnmounted) {
         setGoogleReady(true);
-        setAuthStatus("");
+        setAuthStatus('');
       }
       return true;
     };
 
     if (initGoogleClient()) {
-      return;
+      return undefined;
     }
 
     const existingScript = document.querySelector('script[data-google-gsi="true"]');
-    const script = existingScript || document.createElement("script");
+    const script = existingScript || document.createElement('script');
 
     if (!existingScript) {
       script.src = GOOGLE_SCRIPT_SRC;
       script.async = true;
       script.defer = true;
-      script.dataset.googleGsi = "true";
+      script.dataset.googleGsi = 'true';
       document.head.appendChild(script);
     }
 
@@ -130,8 +143,8 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
       setAuthStatus("Google skript yuklanmadi. Internet yoki brauzer bloklovchisini tekshiring.");
     };
 
-    script.addEventListener("load", startInitPolling);
-    script.addEventListener("error", handleScriptError);
+    script.addEventListener('load', startInitPolling);
+    script.addEventListener('error', handleScriptError);
 
     if (window.google?.accounts?.oauth2) {
       startInitPolling();
@@ -139,8 +152,8 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
 
     return () => {
       isUnmounted = true;
-      script.removeEventListener("load", startInitPolling);
-      script.removeEventListener("error", handleScriptError);
+      script.removeEventListener('load', startInitPolling);
+      script.removeEventListener('error', handleScriptError);
       if (pollTimer) {
         window.clearInterval(pollTimer);
       }
@@ -148,7 +161,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
   }, []);
 
   const fetchGoogleProfile = async (accessToken) => {
-    const response = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -171,7 +184,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
       tokenClientRef.current = createTokenClient();
       if (tokenClientRef.current) {
         setGoogleReady(true);
-        setAuthStatus("");
+        setAuthStatus('');
       }
     }
 
@@ -182,26 +195,21 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
 
     tokenClientRef.current.callback = async (tokenResponse) => {
       if (tokenResponse.error) {
-        setAuthStatus("Google orqali autentifikatsiya amalga oshmadi.");
+        setAuthStatus('Google orqali autentifikatsiya amalga oshmadi.');
         return;
       }
 
       try {
         const profile = await fetchGoogleProfile(tokenResponse.access_token);
         const nextUser = {
-          name: profile.name || profile.email || "Foydalanuvchi",
-          email: profile.email || "",
-          picture: profile.picture || ""
+          name: profile.name || profile.email || 'Foydalanuvchi',
+          email: profile.email || '',
+          picture: profile.picture || ''
         };
 
         setUser(nextUser);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
-
-        if (mode === "register") {
-          setAuthStatus("Google orqali ro'yxatdan o'tdingiz.");
-        } else {
-          setAuthStatus("Google orqali tizimga kirdingiz.");
-        }
+        setAuthStatus(mode === 'register' ? "Google orqali ro'yxatdan o'tdingiz." : 'Google orqali tizimga kirdingiz.');
       } catch (error) {
         console.error(error);
         setAuthStatus("Profil ma'lumotini olishda xatolik bo'ldi.");
@@ -209,7 +217,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
     };
 
     tokenClientRef.current.requestAccessToken({
-      prompt: mode === "register" ? "consent select_account" : "select_account"
+      prompt: mode === 'register' ? 'consent select_account' : 'select_account'
     });
   };
 
@@ -223,24 +231,14 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
     setAuthStatus("Hisobdan chiqdingiz.");
   };
 
-  const actionItems = [
-    { icon: <FaBalanceScale />, label: "Taqqoslash" },
-    { icon: <FaCreditCard />, label: "To'lov qilish" },
-    { icon: <FaTruck />, label: "Buyurtma holati" },
-    { icon: <FaShoppingCart />, label: "Savat" },
-    { icon: <FaHeart />, label: "Sevimlilar" }
-  ];
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
 
-  const navLinks = [
-    "Super narx",
-    "0-0-6",
-    "Havo tozalagichlar",
-    "Smartfonlar",
-    "Maishiy texnika",
-    "Kitoblar",
-    "Televizorlar",
-    "Noutbuklar"
-  ];
+    const isCategoryRoute = CATEGORY_LINKS.some((category) => category.path === location.pathname);
+    if (!isCategoryRoute) {
+      navigate(DEFAULT_CATEGORY.path);
+    }
+  };
 
   const authDisabled = Boolean(GOOGLE_CLIENT_ID) && !googleReady;
 
@@ -248,18 +246,13 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
     <header className="navbar">
       <div className="navbar-shell">
         <div className="navbar-top">
-          <div className="logo">
+          <button className="logo logo-btn" type="button" onClick={() => navigate(DEFAULT_CATEGORY.path)}>
             <span className="logo-icon">A</span>
             <span className="logo-text">asaxiy</span>
-          </div>
+          </button>
 
-          <form
-            className="search-box"
-            onSubmit={(event) => {
-              event.preventDefault();
-            }}
-          >
-            <button className="category-btn" type="button">
+          <form className="search-box" onSubmit={handleSearchSubmit}>
+            <button className="category-btn" type="button" onClick={() => navigate(DEFAULT_CATEGORY.path)}>
               <FaBars /> Kategoriyalar
             </button>
             <input
@@ -275,17 +268,21 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
 
           <div className="actions">
             <div className="action-links">
-              {actionItems.map((item) => (
-                <div className="action-item" key={item.label}>
-                  {item.icon}
+              {ACTION_LINKS.map((item) => (
+                <NavLink key={item.path} to={item.path} className={({ isActive }) => `action-item${isActive ? ' active' : ''}`}>
+                  {ACTION_ICON_MAP[item.label]}
                   <span>{item.label}</span>
-                </div>
+                </NavLink>
               ))}
 
-              <div className="action-item">
+              <button
+                className="action-item action-lang"
+                type="button"
+                onClick={() => setLanguage((current) => (current === 'uz' ? 'ru' : 'uz'))}
+              >
                 <FaGlobe />
-                <span>O'zbekcha</span>
-              </div>
+                <span>{language === 'uz' ? "O'zbekcha" : 'Ruscha'}</span>
+              </button>
             </div>
 
             <div className="auth-panel">
@@ -308,7 +305,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
                     className="auth-btn login-btn"
                     type="button"
                     disabled={authDisabled}
-                    onClick={() => handleGoogleAuth("login")}
+                    onClick={() => handleGoogleAuth('login')}
                   >
                     <FaGoogle />
                     Login
@@ -317,7 +314,7 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
                     className="auth-btn register-btn"
                     type="button"
                     disabled={authDisabled}
-                    onClick={() => handleGoogleAuth("register")}
+                    onClick={() => handleGoogleAuth('register')}
                   >
                     <FaGoogle />
                     Register
@@ -332,10 +329,10 @@ function Navbar({ searchQuery = "", onSearchChange = () => {} }) {
         </div>
 
         <nav className="navbar-bottom">
-          {navLinks.map((link) => (
-            <a href="#" key={link}>
-              {link}
-            </a>
+          {CATEGORY_LINKS.map((category) => (
+            <NavLink key={category.path} to={category.path}>
+              {category.label}
+            </NavLink>
           ))}
         </nav>
       </div>

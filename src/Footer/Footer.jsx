@@ -1,7 +1,14 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import './Footer.css';
+import { CATEGORY_LINKS } from '../config/navigation';
 
-const quickLinks = ['Aksiyalar', "To'lov va yetkazib berish", 'Kafolat', 'Qaytarish siyosati'];
+const quickLinks = [
+  { label: 'Aksiyalar', to: '/super-narx' },
+  { label: "To'lov va yetkazib berish", to: '/tolov-qilish' },
+  { label: 'Kafolat', to: '/buyurtma-holati' },
+  { label: 'Qaytarish siyosati', to: '/sevimlilar' }
+];
 
 function Footer() {
   return (
@@ -17,9 +24,14 @@ function Footer() {
 
         <div className="footer-links">
           {quickLinks.map((link) => (
-            <a href="#" key={link}>
-              {link}
-            </a>
+            <NavLink key={link.to} to={link.to}>
+              {link.label}
+            </NavLink>
+          ))}
+          {CATEGORY_LINKS.slice(0, 2).map((category) => (
+            <NavLink key={category.path} to={category.path}>
+              {category.label}
+            </NavLink>
           ))}
         </div>
       </div>
