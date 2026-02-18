@@ -6,43 +6,46 @@ function BuyInOneClickModal({ open, handleClose, product }) {
   const [phoneNumber, setPhoneNumber] = useState('+998');
   const [fullName, setFullName] = useState('');
 
-  if (!open || !product) return null;
+  if (!open || !product) {
+    return null;
+  }
 
   const handleBuy = () => {
-    alert("Buyurtma qabul qilindi! Tez orada habar beramiz.");
+    alert("Buyurtma qabul qilindi. Tez orada siz bilan bog'lanamiz.");
     handleClose();
+    setQuantity(1);
+    setPhoneNumber('+998');
+    setFullName('');
   };
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={(event) => event.stopPropagation()}>
         <div className="modal-header">
-          <h2>Купить в один клик</h2>
-          <button className="modal-close-btn" onClick={handleClose}>×</button>
+          <h2>Bir klikda xarid</h2>
+          <button className="modal-close-btn" type="button" onClick={handleClose}>
+            &times;
+          </button>
         </div>
 
         <div className="modal-body">
           <div className="modal-product-info">
-            <img 
-              src={product.image} 
-              alt={product.name}
-              className="modal-product-img"
-            />
+            <img src={product.image} alt={product.name} className="modal-product-img" />
             <div className="modal-product-details">
               <h3>{product.name}</h3>
-              <p className="modal-product-price">
-                {product.price.toLocaleString()} сум
-              </p>
-              
+              <p className="modal-product-price">{product.price.toLocaleString()} som</p>
+
               <div className="modal-quantity-selector">
-                <button 
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                <button
+                  className="modal-qty-btn"
+                  type="button"
+                  onClick={() => setQuantity((current) => Math.max(1, current - 1))}
                   disabled={quantity <= 1}
                 >
-                  −
+                  -
                 </button>
-                <span>{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)}>
+                <span className="modal-qty-value">{quantity}</span>
+                <button className="modal-qty-btn" type="button" onClick={() => setQuantity((current) => current + 1)}>
                   +
                 </button>
               </div>
@@ -51,28 +54,34 @@ function BuyInOneClickModal({ open, handleClose, product }) {
 
           <div className="modal-form">
             <div className="modal-form-group">
-              <label>Номер телефона</label>
+              <label htmlFor="phone-number">Telefon raqami</label>
               <input
+                id="phone-number"
+                className="modal-input"
                 type="text"
                 placeholder="99 123 45 67"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={(event) => setPhoneNumber(event.target.value)}
               />
             </div>
 
             <div className="modal-form-group">
-              <label>Имя и фамилия</label>
+              <label htmlFor="full-name">Ism va familiya</label>
               <input
+                id="full-name"
+                className="modal-input"
                 type="text"
-                placeholder="Введите имя и фамилию"
+                placeholder="Ismingizni kiriting"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(event) => setFullName(event.target.value)}
               />
             </div>
           </div>
 
           <div className="modal-footer">
-            <button onClick={handleBuy}>Купить</button>
+            <button className="modal-buy-btn" type="button" onClick={handleBuy}>
+              Xarid qilish
+            </button>
           </div>
         </div>
       </div>
