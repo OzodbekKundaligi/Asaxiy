@@ -7,6 +7,7 @@ import BuyInOneClickModal from './BuyInOneClickModal';
 import Footer from '../Footer/Footer'
 function Product() {
   const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -26,11 +27,29 @@ function Product() {
     setSelectedProduct(null);
   };
 
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredProducts = products.filter((product) => {
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    const searchableText = [
+      product.name,
+      product.badge,
+      product.installment
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return searchableText.includes(normalizedQuery);
+  });
+
   return (
     <>
-      <Navbar />
+      <Navbar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       <div className="product">
-        {products.map(p => (
+        {filteredProducts.map(p => (
           <div className='cards' key={p.id}>
             {p.badge && (
               <span className='badge' style={{
@@ -83,6 +102,10 @@ function Product() {
           </div>
         ))}
       </div>
+
+      {!filteredProducts.length && (
+        <p className="empty-search">Mahsulot topilmadi.</p>
+      )}
 
       {modalOpen && selectedProduct && (
         <BuyInOneClickModal 
